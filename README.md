@@ -4,3 +4,6 @@ Link to potential data sets <br>
 https://www.kaggle.com/datasets/ambarish/breakhis/ <br>
 https://iciar2018-challenge.grand-challenge.org/ (need to register for access) <br>
 MIFLUDAN Project (need to request access)
+
+## Week 8 Work
+ - [Pretrained Model Exploration](pretrained_model_exploration)
