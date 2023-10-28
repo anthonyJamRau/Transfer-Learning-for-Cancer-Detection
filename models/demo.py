@@ -5,6 +5,9 @@ from tensorflow.keras import datasets
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.vgg19 import preprocess_input, decode_predictions
 import numpy as np
+from scriptime import Timer
+
+timer = Timer(method="env")
 
 """
 This file shows how to use the Models class in models.py
@@ -53,19 +56,33 @@ def test_alex_breakhis():
     )
 
 
+def test_vgg_breakhis():
+    vgg = models.load_model("VGGNet_BreaKHis.pkl")
+    loss, auc, accuracy = vgg.evaluate(models.AlexNetBreaKHis_test, verbose=1)
+    print(
+        f"\nROC-AUC:   {auc:.5f}",
+        f"Accuracy:  {accuracy:.5f}",
+        f"Loss:      {loss:.5f}\n",
+        sep="\n",
+    )
+
+
 if __name__ == "__main__":
+    timer.start()
     # models.build_AlexNet_mnist()  # Builds an AlexNet model based on MNIST data set. ONLY RUN TO RETRAIN THE MODEL
     # models.build_VGGNet_imagenet()  # Builds a VGGNet model based on ImageNet data set. ONLY RUN TO RETRAIN THE MODEL
     # models.build_AlexNet_breakhis()
-    print(
-        "-----------------------------------\nTesting VGGNet ImageNet...\n-----------------------------------"
-    )
-    test_vgg_imagenet()
-    print(
-        "-----------------------------------\nTesting AlexNet MNIST...\n-----------------------------------"
-    )
-    test_alex_mnist()
-    print(
-        "-----------------------------------\nTesting AlexNet BreaKHis...\n-----------------------------------"
-    )
-    test_alex_breakhis()
+    models.build_VGGNet_breakhis()
+    timer.send_email(["jstr36@gmail.com", "9064202283@txt.att.net"])
+    # print(
+    #     "-----------------------------------\nTesting VGGNet ImageNet...\n-----------------------------------"
+    # )
+    # test_vgg_imagenet()
+    # print(
+    #     "-----------------------------------\nTesting AlexNet MNIST...\n-----------------------------------"
+    # )
+    # test_alex_mnist()
+    # print(
+    #     "-----------------------------------\nTesting AlexNet BreaKHis...\n-----------------------------------"
+    # )
+    # test_alex_breakhis()
