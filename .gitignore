@@ -160,3 +160,16 @@ cython_debug/
 #.idea/
 
 data/
+models/VGGNet_Model.pkl
+models/AlexNet_BreaKHis.pkl/fingerprint.pb
+models/AlexNet_BreaKHis.pkl/keras_metadata.pb
+models/AlexNet_BreaKHis.pkl/saved_model.pb
+models/AlexNet_BreaKHis.pkl/variables/variables.data-00000-of-00001
+models/AlexNet_BreaKHis.pkl/variables/variables.index
+models/AlexNet_Model.pkl/fingerprint.pb
+models/AlexNet_Model.pkl/keras_metadata.pb
+models/AlexNet_Model.pkl/saved_model.pb
+models/AlexNet_Model.pkl/variables/variables.data-00000-of-00001
+models/AlexNet_Model.pkl/variables/variables.index
+detecting-breast-cancer-with-computer-vision.ipynb
+models/test.ipynb
