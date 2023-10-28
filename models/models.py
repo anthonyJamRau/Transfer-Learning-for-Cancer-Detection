@@ -28,6 +28,7 @@ class Models:
     def __init__(self) -> None:
         self.AlexNet_x_test = None
         self.AlexNet_y_test = None
+        self.AlexNetBreaKHis_test = None
         self.VGGNet_imagenet_path = f"VGGNet_ImageNet_Model.pkl"
         self.AlexNet_mnist_path = f"AlexNet_MNIST_Model.pkl"
 
@@ -146,6 +147,7 @@ class Models:
             .map(load_image)
             .batch(BATCH_SIZE)
         )
+        self.AlexNetBreaKHis_test = test_ds
 
         # Cache and prefetch data for faster training
         AUTOTUNE = tf.data.AUTOTUNE
@@ -225,7 +227,43 @@ class Models:
             plt.show()
 
     def load_model(self, path):
-        if "Alex" in path:
+        if "AlexNet_BreaKHis" in path:
+            SEED = 51432
+            tf.keras.utils.set_random_seed(SEED)
+            tf.config.experimental.enable_op_determinism()
+            fold_info = pd.read_csv(
+                "/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/models/data/BreaKHis_v1/Folds.csv"
+            )
+            fold_info["label"] = fold_info["filename"].str.extract("(malignant|benign)")
+            train = fold_info.query("grp == 'train'")
+            test = fold_info.query("grp == 'test'")
+            classes = dict(benign=0, malignant=1)
+            y = train["label"].map(classes)
+            IMG_SIZE = 224
+            BATCH_SIZE = 28
+
+            def load_image(filename: str, label: int) -> Tuple[tf.Tensor, str]:
+                file = tf.io.read_file("data/" + filename)
+                img = tf.image.decode_png(file, channels=3)
+                img = tf.image.resize_with_pad(img, IMG_SIZE, IMG_SIZE)
+                return img, label
+
+            # Prepare training and validation datasets
+            # X_train, X_valid, y_train, y_valid = train_test_split(
+            #     train["filename"], train["label"].map(classes), random_state=SEED
+            # )
+            # Prepare test dataset
+            test = test.sample(frac=1, random_state=SEED)  # shuffle test data
+            test_ds = (
+                tf.data.Dataset.from_tensor_slices(
+                    (test["filename"], test["label"].map(classes))
+                )
+                .map(load_image)
+                .batch(BATCH_SIZE)
+            )
+            self.AlexNetBreaKHis_test = test_ds
+            return load_model(path)
+        elif "Alex" in path:
             (_, _), (
                 x_test,
                 y_test,

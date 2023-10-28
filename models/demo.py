@@ -42,15 +42,30 @@ def test_alex_mnist():
     )  # Use the built-in TensorFlow method
 
 
+def test_alex_breakhis():
+    alex = models.load_model("AlexNet_BreaKHis.pkl")
+    loss, auc, accuracy = alex.evaluate(models.AlexNetBreaKHis_test, verbose=1)
+    print(
+        f"\nROC-AUC:   {auc:.5f}",
+        f"Accuracy:  {accuracy:.5f}",
+        f"Loss:      {loss:.5f}\n",
+        sep="\n",
+    )
+
+
 if __name__ == "__main__":
     # models.build_AlexNet_mnist()  # Builds an AlexNet model based on MNIST data set. ONLY RUN TO RETRAIN THE MODEL
     # models.build_VGGNet_imagenet()  # Builds a VGGNet model based on ImageNet data set. ONLY RUN TO RETRAIN THE MODEL
-    models.build_AlexNet_breakhis()
-    # print(
-    #     "-----------------------------------\nTesting VGGNet...\n-----------------------------------"
-    # )
-    # test_vgg_imagenet()
-    # print(
-    #     "-----------------------------------\nTesting AlexNet...\n-----------------------------------"
-    # )
-    # test_alex_mnist()
+    # models.build_AlexNet_breakhis()
+    print(
+        "-----------------------------------\nTesting VGGNet ImageNet...\n-----------------------------------"
+    )
+    test_vgg_imagenet()
+    print(
+        "-----------------------------------\nTesting AlexNet MNIST...\n-----------------------------------"
+    )
+    test_alex_mnist()
+    print(
+        "-----------------------------------\nTesting AlexNet BreaKHis...\n-----------------------------------"
+    )
+    test_alex_breakhis()
