@@ -1,5 +1,4 @@
-import datetime
-import os
+import zipfile
 from typing import Tuple
 
 import cv2
@@ -9,20 +8,13 @@ import numpy as np
 import pandas as pd
 import seaborn as sb
 import tensorflow as tf
-from cleanvision import Imagelab
-from matplotlib import ticker
-from PIL import Image
-from sklearn import metrics
-from sklearn.linear_model import LogisticRegressionCV
-from sklearn.model_selection import GroupShuffleSplit, train_test_split
+from sklearn.model_selection import train_test_split
 from tensorflow.keras import datasets, layers, losses, models
 from tensorflow.keras.applications import VGG19
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
-from tensorflow.keras.layers import Dense, Flatten, GlobalAveragePooling2D
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.optimizers.legacy import Adam
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import load_model
 
+# Prepares data to be used in testing the models.
 SEED = 51432
 IMG_SIZE = 224
 BATCH_SIZE = 28
@@ -77,20 +69,32 @@ test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 
 class Models:
+    """
+    Contains the logic for building all models as well as functions to load the models once they are built.
+    """
+
     def __init__(self) -> None:
         self.AlexNet_x_test = None
         self.AlexNet_y_test = None
         self.AlexNetBreaKHis_test = test_ds
-        self.VGGNet_imagenet_path = f"VGGNet_ImageNet_Model.pkl"
-        self.AlexNet_mnist_path = f"AlexNet_MNIST_Model.pkl"
-        self.VGGNet_breakhis_path = f"VGGNet_BreaKHis.pkl"
-        self.AlexNet_breakhis_path = f"AlexNet_BreaKHis.pkl"
+        self.VGGNet_imagenet_path = f"VGGNet_ImageNet_Model"
+        self.AlexNet_mnist_path = f"AlexNet_MNIST_Model"
+        self.VGGNet_breakhis_path = f"VGGNet_BreaKHis"
+        self.AlexNet_breakhis_path = f"AlexNet_BreaKHis"
 
     def build_VGGNet_imagenet(self):
+        """
+        Builds an instance of VGG19 from ImageNet
+        """
         model = VGG19(weights="imagenet")
-        joblib.dump(model, self.VGGNet_imagenet_path)
+        model.save(self.VGGNet_imagenet_path)
 
     def build_VGGNet_breakhis(self):
+        """
+        Builds an instance of VGG19 using transfer learning from ImageNet and trained further on BreaKHis
+
+        Note: takes ~21 hours to train so consider if you need to run this method.
+        """
         base = VGG19(
             include_top=False,
             input_shape=(IMG_SIZE, IMG_SIZE, 3),
@@ -143,6 +147,9 @@ class Models:
         model.save(self.VGGNet_breakhis_path)
 
     def build_AlexNet_mnist(self, visualize_training=False):
+        """
+        Builds an instance of AlexNet trained on the MNIST data set.
+        """
         (x_train, y_train), (
             x_test,
             y_test,
@@ -210,7 +217,9 @@ class Models:
             plt.show()
 
     def build_AlexNet_breakhis(self, visualize_training=False):
-        # ACTUAL ALEXNET PART
+        """
+        Builds an instance of AlexNet trained on the BreaKHis data.
+        """
         model = models.Sequential()
 
         model.add(
@@ -278,7 +287,7 @@ class Models:
             axs[1].legend(["Train", "Val"])
             plt.show()
 
-    def load_model(self, path):
+    def open_model(self, path):
         if "AlexNet_BreaKHis" in path:
             SEED = 51432
             tf.keras.utils.set_random_seed(SEED)
@@ -300,11 +309,6 @@ class Models:
                 img = tf.image.resize_with_pad(img, IMG_SIZE, IMG_SIZE)
                 return img, label
 
-            # Prepare training and validation datasets
-            # X_train, X_valid, y_train, y_valid = train_test_split(
-            #     train["filename"], train["label"].map(classes), random_state=SEED
-            # )
-            # Prepare test dataset
             test = test.sample(frac=1, random_state=SEED)  # shuffle test data
             test_ds = (
                 tf.data.Dataset.from_tensor_slices(
@@ -329,4 +333,4 @@ class Models:
             self.AlexNet_y_test = y_test
             return load_model(path)
         else:
-            return joblib.load(path)
+            return load_model(path)
