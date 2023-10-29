@@ -5,9 +5,6 @@ from tensorflow.keras import datasets
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.vgg19 import preprocess_input, decode_predictions
 import numpy as np
-from scriptime import Timer
-
-timer = Timer(method="env")
 
 """
 This file shows how to use the Models class in models.py
@@ -18,8 +15,8 @@ models = Models()
 
 
 def test_vgg_imagenet():
-    vggnet = models.load_model(
-        "VGGNet_Model.pkl"
+    vggnet = models.open_model(
+        "/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/models/VGGNet_ImageNet_Model"
     )  # Load the trained model. Be sure to use the correct path.
 
     # Formats image appropriately
@@ -37,16 +34,21 @@ def test_vgg_imagenet():
 
 
 def test_alex_mnist():
-    alex = models.load_model(
-        "AlexNet_Model.pkl"
+    alex = models.open_model(
+        "AlexNet_Model"
     )  # Load the trained model. Be sure to use the correct path.
-    alex.evaluate(
+    loss, accuracy = alex.evaluate(
         models.AlexNet_x_test, models.AlexNet_y_test
     )  # Use the built-in TensorFlow method
+    print(
+        f"Accuracy:  {accuracy:.5f}",
+        f"Loss:      {loss:.5f}\n",
+        sep="\n",
+    )
 
 
 def test_alex_breakhis():
-    alex = models.load_model("AlexNet_BreaKHis.pkl")
+    alex = models.open_model("AlexNet_BreaKHis")
     loss, auc, accuracy = alex.evaluate(models.AlexNetBreaKHis_test, verbose=1)
     print(
         f"\nROC-AUC:   {auc:.5f}",
@@ -57,7 +59,7 @@ def test_alex_breakhis():
 
 
 def test_vgg_breakhis():
-    vgg = models.load_model("VGGNet_BreaKHis.pkl")
+    vgg = models.open_model("VGGNet_BreaKHis")
     loss, auc, accuracy = vgg.evaluate(models.AlexNetBreaKHis_test, verbose=1)
     print(
         f"\nROC-AUC:   {auc:.5f}",
@@ -68,21 +70,23 @@ def test_vgg_breakhis():
 
 
 if __name__ == "__main__":
-    timer.start()
     # models.build_AlexNet_mnist()  # Builds an AlexNet model based on MNIST data set. ONLY RUN TO RETRAIN THE MODEL
-    # models.build_VGGNet_imagenet()  # Builds a VGGNet model based on ImageNet data set. ONLY RUN TO RETRAIN THE MODEL
-    # models.build_AlexNet_breakhis()
-    models.build_VGGNet_breakhis()
-    timer.send_email(["jstr36@gmail.com", "9064202283@txt.att.net"])
-    # print(
-    #     "-----------------------------------\nTesting VGGNet ImageNet...\n-----------------------------------"
-    # )
-    # test_vgg_imagenet()
-    # print(
-    #     "-----------------------------------\nTesting AlexNet MNIST...\n-----------------------------------"
-    # )
-    # test_alex_mnist()
-    # print(
-    #     "-----------------------------------\nTesting AlexNet BreaKHis...\n-----------------------------------"
-    # )
-    # test_alex_breakhis()
+    # models.build_VGGNet_imagenet()  # Builds a VGG19 model based on ImageNet data set. ONLY RUN TO RETRAIN THE MODEL
+    # models.build_AlexNet_breakhis()  # Builds an AlexNet model based on BreaKHis data set. ONLY RUN TO RETRAIN THE MODEL
+    # models.build_VGGNet_breakhis()  # Builds a VGG19 model based on BreaKHis data set. ONLY RUN TO RETRAIN THE MODEL
+    print(
+        "-----------------------------------\nTesting VGGNet ImageNet...\n-----------------------------------"
+    )
+    test_vgg_imagenet()
+    print(
+        "-----------------------------------\nTesting AlexNet MNIST...\n-----------------------------------"
+    )
+    test_alex_mnist()
+    print(
+        "-----------------------------------\nTesting AlexNet BreaKHis...\n-----------------------------------"
+    )
+    test_alex_breakhis()
+    print(
+        "-----------------------------------\nTesting VGGNet BreaKHis...\n-----------------------------------"
+    )
+    test_vgg_breakhis()
