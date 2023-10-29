@@ -159,7 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-data/
+models/data/BreaKHis_v1
 models/VGGNet_Model.pkl
 models/AlexNet_BreaKHis.pkl/fingerprint.pb
 models/AlexNet_BreaKHis.pkl/keras_metadata.pb
@@ -173,3 +173,7 @@ models/AlexNet_Model.pkl/variables/variables.data-00000-of-00001
 models/AlexNet_Model.pkl/variables/variables.index
 detecting-breast-cancer-with-computer-vision.ipynb
 models/test.ipynb
+models/AlexNet_BreaKHis
+models/AlexNet_Model
+models/VGGNet_BreaKHis
+models/VGGNet_ImageNet_Model
