@@ -181,3 +181,7 @@ models/AlexNet_BreaKHis.zip
 models/AlexNet_Model.zip
 models/VGGNet_BreaKHis.zip
 models/VGGNet_ImageNet_Model.zip
+.ipynb_checkpoints/
+BreakHis/
+Input/
+Train/
