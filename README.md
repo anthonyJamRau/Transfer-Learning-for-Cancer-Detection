@@ -67,4 +67,6 @@ MIFLUDAN Project (need to request access)
 
 At this point you should be able to use the models in any other code in the same way it is used in the demo code (replacing `evaluate()` with `predict()` if you are trying to predict for an item/set of items.) 
 
-One other thing to note: when you `from models import Models`, be sure to double check that path when you are doing this in another file. Depending on the location of the file you're working in this path may need to be changed. The `from models` is referring to models.py, `import Models` the class within the file.
+One thing to note: when you `from models import Models`, be sure to double check that path when you are doing this in another file. Depending on the location of the file you're working in this path may need to be changed. The `from models` is referring to models.py, `import Models` the class within the file.
+
+Finally, be aware that some models are slow to build/test, namely the VGG19 with BreaKHis data. It takes around 21 hours to train, 30 minutes to test. The others are significantly faster.
