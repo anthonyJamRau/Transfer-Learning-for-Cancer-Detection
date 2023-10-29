@@ -13,8 +13,9 @@ MIFLUDAN Project (need to request access)
 
 ### Instructions for Using the Models
 
-1. Unzip the four zip files. There should be two AlexNet, two VGG19 models.
-2. Download the BreaKHis_V1 dataset and have the following file structure:
+1. Download the zip files from [this Google Drive folder](https://drive.google.com/drive/folders/1DgCZn3C6yaeGEUnvJTnDEKkcK7UU0XQJ?usp=sharing) (the files were too big to add to git.)
+2. Unzip the four zip files. There should be two AlexNet, two VGG19 models. 
+3. Download the BreaKHis_V1 dataset and have the following file structure:
     ```
     .
     └── models/
@@ -26,8 +27,8 @@ MIFLUDAN Project (need to request access)
         ├── models.py
         └── demo.py
     ```
-3. You should now just be able to run `python demo.py` (or `python3` depending on how you have things set up.) You'll probably need to `pip install` some stuff too. 
-4. After running the demo you should see an ouput that looks something like:
+4. You should now just be able to run `python demo.py` (or `python3` depending on how you have things set up.) You'll probably need to `pip install` some stuff too. 
+5. After running the demo you should see an ouput that looks something like:
    ```
     -----------------------------------
     Testing VGGNet ImageNet...
