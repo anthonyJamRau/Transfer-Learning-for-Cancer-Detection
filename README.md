@@ -74,3 +74,4 @@ Finally, be aware that some models are slow to build/test, namely the VGG19 with
 ## Week 10 Work
 
  - [Plots](plots/)
+ - [Anthony week 10 progress report](https://docs.google.com/document/d/1uZBvFIIUoIUqIU0TjwWCGviU0bXXt-hJTB-bOtpZGXc/edit)
