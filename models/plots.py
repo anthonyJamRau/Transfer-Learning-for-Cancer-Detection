@@ -6,7 +6,7 @@ from sklearn import metrics
 from tensorflow.keras.applications.vgg19 import decode_predictions, preprocess_input
 from tensorflow.keras.preprocessing import image
 
-from models import Models
+from og_models import Models
 
 """
 This file shows how to use the Models class in models.py
@@ -56,7 +56,7 @@ def test_alex_breakhis():
     evaluate_model(
         alex,
         models.AlexNetBreaKHis_test,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/AlexNetBreaKHis",
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/AlexNetBreaKHis/w11",
     )
 
 
@@ -65,7 +65,16 @@ def test_vgg_breakhis():
     evaluate_model(
         vgg,
         models.AlexNetBreaKHis_test,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis",
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis/w11",
+    )
+
+
+def test_vgg_breakhis_optimized():
+    vgg = models.open_model("VGGNet_BreaKHis_optimized")
+    evaluate_model(
+        vgg,
+        models.AlexNetBreaKHis_test,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis_optimized/w11",
     )
 
 
@@ -139,6 +148,10 @@ if __name__ == "__main__":
             "-----------------------------------\nTesting VGGNet BreaKHis...\n-----------------------------------"
         )
         test_vgg_breakhis()
+        print(
+            "-----------------------------------\nTesting VGGNet (Optimized) BreaKHis...\n-----------------------------------"
+        )
+        test_vgg_breakhis_optimized()
     except TypeError:
         print(
             "A TypeError has occurred. If the plots showed up as expected, feel free to ignore this."
