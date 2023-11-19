@@ -56,31 +56,36 @@ test_inds, validation_inds = next(split_2)
 test = temp_test.iloc[test_inds].reset_index(drop=True)
 validation = temp_test.iloc[validation_inds].reset_index(drop=True)
 
-# intitialize series for tf
-# pulling in data from 2 directories. One I created with Carson's normalized pngs, another from augmented images generated to Augmented_train
-# X_train = pd.concat(
-#     [
-#         "Normalized/" + train["input_path"],
-#         "Augmented_train/" + pd.Series(os.listdir("Augmented_train")),
-#     ],
-#     ignore_index=True,
-# )
-# y_train = pd.concat(
-#     [
-#         train["encoded_class"],
-#         pd.Series([0 for i in range(len(os.listdir("Augmented_train")))]),
-#     ],
-#     ignore_index=True,
-# )
+do_validation = (
+    False  # my "cleaner" way of making the code work without just commenting it out
+)
+if do_validation:
+    # intitialize series for tf
+    # pulling in data from 2 directories. One I created with Carson's normalized pngs, another from augmented images generated to Augmented_train
+    X_train = pd.concat(
+        [
+            "Normalized/" + train["input_path"],
+            "Augmented_train/" + pd.Series(os.listdir("Augmented_train")),
+        ],
+        ignore_index=True,
+    )
+    y_train = pd.concat(
+        [
+            train["encoded_class"],
+            pd.Series([0 for i in range(len(os.listdir("Augmented_train")))]),
+        ],
+        ignore_index=True,
+    )
 
-# # Wierdly, I am missing one file from Carson's normalized images - just me?
-# X_train = X_train[
-#     X_train != "Normalized/40_malignant_ductal_carcinoma_SOB_M_DC-14-15572-40-008.png"
-# ]
-# y_train = y_train[y_train.index != 1867]
+    # Wierdly, I am missing one file from Carson's normalized images - just me?
+    X_train = X_train[
+        X_train
+        != "Normalized/40_malignant_ductal_carcinoma_SOB_M_DC-14-15572-40-008.png"
+    ]
+    y_train = y_train[y_train.index != 1867]
 
-# X_validation = "Normalized/" + validation["input_path"]
-# y_validation = validation["encoded_class"]
+    X_validation = "Normalized/" + validation["input_path"]
+    y_validation = validation["encoded_class"]
 X_test = "Normalized/" + test["input_path"]
 y_test = test["encoded_class"]
 
@@ -92,16 +97,17 @@ def load_image(filename: str, label: int) -> Tuple[tf.Tensor, str]:
     return img, label
 
 
-# train_ds = (
-#     tf.data.Dataset.from_tensor_slices((X_train, y_train))
-#     .map(load_image)
-#     .batch(BATCH_SIZE)
-# )
-# validation_ds = (
-#     tf.data.Dataset.from_tensor_slices((X_validation, y_validation))
-#     .map(load_image)
-#     .batch(BATCH_SIZE)
-# )
+if do_validation:
+    train_ds = (
+        tf.data.Dataset.from_tensor_slices((X_train, y_train))
+        .map(load_image)
+        .batch(BATCH_SIZE)
+    )
+    validation_ds = (
+        tf.data.Dataset.from_tensor_slices((X_validation, y_validation))
+        .map(load_image)
+        .batch(BATCH_SIZE)
+    )
 
 test_ds = (
     tf.data.Dataset.from_tensor_slices((X_test, y_test))
@@ -109,11 +115,14 @@ test_ds = (
     .batch(BATCH_SIZE)
 )
 
+
 # Cache and prefetch data for faster training
 AUTOTUNE = tf.data.AUTOTUNE
-# train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
-# validation_ds = validation_ds.cache().prefetch(buffer_size=AUTOTUNE)
+if do_validation:
+    train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
+    validation_ds = validation_ds.cache().prefetch(buffer_size=AUTOTUNE)
 test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
+print(f"{len(test_ds)=}")
 
 
 class Models:
@@ -124,6 +133,7 @@ class Models:
     def __init__(self) -> None:
         self.AlexNet_x_test = None
         self.AlexNet_y_test = None
+        self.test_ds = test_ds
         self.AlexNetBreaKHis_test = test_ds
         self.VGGNet_imagenet_path = f"VGGNet_ImageNet_Model"
         self.AlexNet_mnist_path = f"AlexNet_MNIST_Model"
