@@ -55,8 +55,8 @@ def test_alex_breakhis():
     )
     evaluate_model(
         alex,
-        models.AlexNetBreaKHis_test,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/AlexNetBreaKHis/w12a",
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/AlexNetBreaKHis/w12b",
     )
 
 
@@ -64,8 +64,8 @@ def test_vgg_breakhis():
     vgg = models.open_model("VGGNet_BreaKHis")
     evaluate_model(
         vgg,
-        models.AlexNetBreaKHis_test,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis/w12a",
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis/w12b",
     )
 
 
@@ -73,8 +73,8 @@ def test_vgg_breakhis_optimized():
     vgg = models.open_model("VGGNet_BreaKHis_optimized")
     evaluate_model(
         vgg,
-        models.AlexNetBreaKHis_test,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis_optimized/w12a",
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis_optimized/w12b",
     )
 
 
