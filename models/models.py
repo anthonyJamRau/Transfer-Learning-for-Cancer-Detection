@@ -27,45 +27,61 @@ tf.keras.utils.set_random_seed(SEED)
 tf.config.experimental.enable_op_determinism()
 
 # read info file
-fold_df = pd.read_csv('Folds.csv',dtype = {"mag":"string"})
+fold_df = pd.read_csv("Folds.csv", dtype={"mag": "string"})
 
 # reduce the info file for the first fold (folds 2-5 are just duplicate images of fold 1 - we only have 7909 unique values)
-fold_df = fold_df[fold_df["fold"]==1]
+fold_df = fold_df[fold_df["fold"] == 1]
 
 # create informative filename, target class, encoded class, id field for splitting
-fold_df['class'] = fold_df['filename'].apply(lambda x:x.split("/")[3])
-fold_df['sub_class'] = fold_df['filename'].apply(lambda x:x.split("/")[5])
-fold_df['patient_id'] = fold_df['filename'].apply(lambda x:x.split("/")[-1])
-cols = ['mag', 'class', 'sub_class','patient_id']
-fold_df['input_path'] = fold_df[cols].apply(lambda row: '_'.join(row.values.astype(str)), axis=1)
-fold_df['encoded_class'] = fold_df['class'].apply(lambda x: 0 if x =='benign' else 1)
+fold_df["class"] = fold_df["filename"].apply(lambda x: x.split("/")[3])
+fold_df["sub_class"] = fold_df["filename"].apply(lambda x: x.split("/")[5])
+fold_df["patient_id"] = fold_df["filename"].apply(lambda x: x.split("/")[-1])
+cols = ["mag", "class", "sub_class", "patient_id"]
+fold_df["input_path"] = fold_df[cols].apply(
+    lambda row: "_".join(row.values.astype(str)), axis=1
+)
+fold_df["encoded_class"] = fold_df["class"].apply(lambda x: 0 if x == "benign" else 1)
 
 # make train and test set
-splitter = GroupShuffleSplit(test_size=.20, n_splits=2, random_state = 7)
-split = splitter.split(fold_df, groups=fold_df['patient_id'])
+splitter = GroupShuffleSplit(test_size=0.20, n_splits=2, random_state=7)
+split = splitter.split(fold_df, groups=fold_df["patient_id"])
 train_inds, test_inds = next(split)
-train = fold_df.iloc[train_inds].reset_index(drop = True)
-temp_test = fold_df.iloc[test_inds].reset_index(drop = True)
+train = fold_df.iloc[train_inds].reset_index(drop=True)
+temp_test = fold_df.iloc[test_inds].reset_index(drop=True)
 
 # make validation set from test set
-splitter_2 = GroupShuffleSplit(test_size=.50, n_splits=2, random_state = 8)
-split_2 = splitter_2.split(temp_test, groups = temp_test['patient_id'])
+splitter_2 = GroupShuffleSplit(test_size=0.50, n_splits=2, random_state=8)
+split_2 = splitter_2.split(temp_test, groups=temp_test["patient_id"])
 test_inds, validation_inds = next(split_2)
-test = temp_test.iloc[test_inds].reset_index(drop = True)
-validation = temp_test.iloc[validation_inds].reset_index(drop = True)
+test = temp_test.iloc[test_inds].reset_index(drop=True)
+validation = temp_test.iloc[validation_inds].reset_index(drop=True)
 
 # intitialize series for tf
 # pulling in data from 2 directories. One I created with Carson's normalized pngs, another from augmented images generated to Augmented_train
-X_train = pd.concat(["Normalized/"+train["input_path"],"Augmented_train/"+pd.Series(os.listdir("Augmented_train"))],ignore_index=True)
-y_train = pd.concat([train["encoded_class"],pd.Series([0 for i in range(len(os.listdir("Augmented_train")))])],ignore_index=True)
+# X_train = pd.concat(
+#     [
+#         "Normalized/" + train["input_path"],
+#         "Augmented_train/" + pd.Series(os.listdir("Augmented_train")),
+#     ],
+#     ignore_index=True,
+# )
+# y_train = pd.concat(
+#     [
+#         train["encoded_class"],
+#         pd.Series([0 for i in range(len(os.listdir("Augmented_train")))]),
+#     ],
+#     ignore_index=True,
+# )
 
-# Wierdly, I am missing one file from Carson's normalized images - just me?
-X_train = X_train[X_train != "Normalized/40_malignant_ductal_carcinoma_SOB_M_DC-14-15572-40-008.png"]
-y_train = y_train[y_train.index != 1867]
+# # Wierdly, I am missing one file from Carson's normalized images - just me?
+# X_train = X_train[
+#     X_train != "Normalized/40_malignant_ductal_carcinoma_SOB_M_DC-14-15572-40-008.png"
+# ]
+# y_train = y_train[y_train.index != 1867]
 
-X_validation = "Normalized/"+validation["input_path"]
-y_validation = validation["encoded_class"]
-X_test = "Normalized/"+test["input_path"]
+# X_validation = "Normalized/" + validation["input_path"]
+# y_validation = validation["encoded_class"]
+X_test = "Normalized/" + test["input_path"]
 y_test = test["encoded_class"]
 
 
@@ -76,17 +92,16 @@ def load_image(filename: str, label: int) -> Tuple[tf.Tensor, str]:
     return img, label
 
 
-
-train_ds = (
-    tf.data.Dataset.from_tensor_slices((X_train, y_train))
-    .map(load_image)
-    .batch(BATCH_SIZE)
-)
-validation_ds = (
-    tf.data.Dataset.from_tensor_slices((X_validation, y_validation))
-    .map(load_image)
-    .batch(BATCH_SIZE)
-)
+# train_ds = (
+#     tf.data.Dataset.from_tensor_slices((X_train, y_train))
+#     .map(load_image)
+#     .batch(BATCH_SIZE)
+# )
+# validation_ds = (
+#     tf.data.Dataset.from_tensor_slices((X_validation, y_validation))
+#     .map(load_image)
+#     .batch(BATCH_SIZE)
+# )
 
 test_ds = (
     tf.data.Dataset.from_tensor_slices((X_test, y_test))
@@ -96,8 +111,8 @@ test_ds = (
 
 # Cache and prefetch data for faster training
 AUTOTUNE = tf.data.AUTOTUNE
-train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
-validation_ds = validation_ds.cache().prefetch(buffer_size=AUTOTUNE)
+# train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
+# validation_ds = validation_ds.cache().prefetch(buffer_size=AUTOTUNE)
 test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 
@@ -180,16 +195,15 @@ class Models:
         print("Finished fitting.")
 
         model.save(self.VGGNet_breakhis_path)
-       
 
     def build_AlexNet_breakhis(self, visualize_training=False):
         """
         Builds an instance of AlexNet trained on the BreaKHis data.
-        
+
         I added relu activations in the 2D convolutions because if we don't pass that in there is no default and no activation is used
-        
+
         About 20M trainable params
-        
+
         """
         model = models.Sequential()
 
@@ -205,12 +219,12 @@ class Models:
                 ),
             )
         )
-        model.add(layers.Conv2D(96, 11, strides=4, padding="same",activation = 'relu'))
+        model.add(layers.Conv2D(96, 11, strides=4, padding="same", activation="relu"))
         model.add(layers.Lambda(tf.nn.local_response_normalization))
-        model.add(layers.Conv2D(256, 5, strides=3, padding="same",activation = 'relu'))
+        model.add(layers.Conv2D(256, 5, strides=3, padding="same", activation="relu"))
         model.add(layers.MaxPooling2D(3, strides=2))
         model.add(layers.Lambda(tf.nn.local_response_normalization))
-        model.add(layers.Conv2D(384, 3, strides=4, padding="same",activation = 'relu'))
+        model.add(layers.Conv2D(384, 3, strides=4, padding="same", activation="relu"))
         model.add(layers.MaxPooling2D(2, strides=2))
         model.add(layers.Flatten())
         model.add(layers.Dense(4096, activation="relu"))
@@ -257,18 +271,18 @@ class Models:
             axs[1].set_ylabel("Accuracy")
             axs[1].legend(["Train", "Val"])
             plt.show()
-            
-    def build_AlexNet_breakhis_hp_optimized(self,hp):
+
+    def build_AlexNet_breakhis_hp_optimized(self, hp):
         """
         Builds an instance of AlexNet trained on the BreaKHis data. Must be called with the bayesian tuner
-        
+
         I rebuilt the structure of this network to be more like the structure in Matlab with grouped convolutional layers
-        
+
         Haven't been able to run this model yet because of memory limitations. There are too many learnable params in this network, would need to utilize ROSIE for training
-        
+
         About 60M trainables
-        
-        Optimizes HPs whether or not to include grouped convolutions, hidden neurons in FC layer, dropout percentage, learning rate 
+
+        Optimizes HPs whether or not to include grouped convolutions, hidden neurons in FC layer, dropout percentage, learning rate
         """
         model = models.Sequential()
 
@@ -284,140 +298,162 @@ class Models:
                 ),
             )
         )
-        
-        model.add(layers.Conv2D(96, 11, strides=4, padding="valid", activation = "relu"))
+
+        model.add(layers.Conv2D(96, 11, strides=4, padding="valid", activation="relu"))
         model.add(tf.keras.layers.BatchNormalization())
         model.add(layers.MaxPooling2D(3, strides=2))
-        model.add(layers.Conv2D(256, 5, strides=1, groups = 2,padding="same", activation = "relu"))
+        model.add(
+            layers.Conv2D(
+                256, 5, strides=1, groups=2, padding="same", activation="relu"
+            )
+        )
         model.add(tf.keras.layers.BatchNormalization())
         model.add(layers.MaxPooling2D(3, strides=2))
-        model.add(layers.Conv2D(384, 3, strides=1, padding="same", activation = "relu"))
-        include_conv1 = hp.Boolean('include_conv1', default = False)
+        model.add(layers.Conv2D(384, 3, strides=1, padding="same", activation="relu"))
+        include_conv1 = hp.Boolean("include_conv1", default=False)
         if include_conv1:
-            model.add(layers.Conv2D(384, 3, strides=1, groups = 2,padding="same", activation = "relu"))
-        include_conv2 = hp.Boolean('include_conv2', default = False)
+            model.add(
+                layers.Conv2D(
+                    384, 3, strides=1, groups=2, padding="same", activation="relu"
+                )
+            )
+        include_conv2 = hp.Boolean("include_conv2", default=False)
         if include_conv2:
-            model.add(layers.Conv2D(384, 3, strides=1, groups = 2,padding="same", activation = "relu"))
-        model.add(layers.MaxPool2D(3, strides = 2))
+            model.add(
+                layers.Conv2D(
+                    384, 3, strides=1, groups=2, padding="same", activation="relu"
+                )
+            )
+        model.add(layers.MaxPool2D(3, strides=2))
         model.add(layers.Flatten())
         model.add(layers.Dense(4096, activation="relu"))
         model.add(layers.Dropout(0.5))
-        model.add(layers.Dense( hp.Int('hidden_size', 1096, 4096, step=1000, default=4096), activation="relu"))
-        model.add(layers.Dropout(hp.Float('dropout', 0, 0.5, step=0.1, default=0.5)))
+        model.add(
+            layers.Dense(
+                hp.Int("hidden_size", 1096, 4096, step=1000, default=4096),
+                activation="relu",
+            )
+        )
+        model.add(layers.Dropout(hp.Float("dropout", 0, 0.5, step=0.1, default=0.5)))
         model.add(layers.Dense(1, activation="softmax"))
         model.summary()
 
         print("Compiling...")
         model.compile(
-            optimizer=tf.keras.optimizers.Adam(hp.Float('learning_rate', 1e-3, 1e-2, sampling='log')),
+            optimizer=tf.keras.optimizers.Adam(
+                hp.Float("learning_rate", 1e-3, 1e-2, sampling="log")
+            ),
             loss=tf.keras.losses.BinaryCrossentropy(),
             metrics=[tf.keras.metrics.AUC(name="roc_auc"), "accuracy"],
         )
         print("Finished compiling.")
-        
+
         return model
 
-    def train_AlexNet_with_bayesian_tuner(self,trials = 20):
-        
+    def train_AlexNet_with_bayesian_tuner(self, trials=20):
         # call build method wich whill compile the model, 20 configurations of networks will be trained if trials not passed in and results saved to a folder with project_name.
-        
+
         tuner = kt.tuners.BayesianOptimization(
-          self.build_AlexNet_breakhis_hp_optimized,
-          objective='val_accuracy',
-          max_trials=trials,
-          overwrite = True,
-          project_name=self.AlexNet_breakhis_path_optimized+"_Bayesian_trials"
+            self.build_AlexNet_breakhis_hp_optimized,
+            objective="val_accuracy",
+            max_trials=trials,
+            overwrite=True,
+            project_name=self.AlexNet_breakhis_path_optimized + "_Bayesian_trials",
         )
 
         early_stopping = EarlyStopping(
             min_delta=1e-4, patience=5, verbose=1, restore_best_weights=True
-            )
+        )
         reduce_lr = ReduceLROnPlateau(factor=0.5, patience=4, verbose=1)
 
         # call tuner.search instead of model.fit
         tuner.search(
-                    train_ds,
-                    validation_data=validation_ds,
-                    epochs=MAX_EPOCHS,
-                    callbacks=[early_stopping, reduce_lr],
-                )
+            train_ds,
+            validation_data=validation_ds,
+            epochs=MAX_EPOCHS,
+            callbacks=[early_stopping, reduce_lr],
+        )
 
         try:
             tuner.get_best_models(1)[0].save(self.AlexNet_breakhis_path)
         except:
             return tuner
         return tuner
-    
-    def build_VGGNet_breakhis_hp_optimized(self,hp):
-            """
-            Builds an instance of VGG19 using transfer learning from ImageNet and trained further on BreaKHis, called with tuner method below
-            Optimizes HPs dropout percnetage, number neurons in FC layer, learning rate
-            
-            About 600K learnables
-            """
-            base = VGG19(
-                include_top=False,
-                input_shape=(IMG_SIZE, IMG_SIZE, 3),
-                weights="imagenet",
-                pooling="avg",
-            )
-            base.trainable = False
-            model = tf.keras.Sequential(
-                [
-                    layers.Input(shape=(IMG_SIZE, IMG_SIZE, 3)),
-                    # Data augmentation
-                    layers.RandomBrightness(0.2, seed=SEED),
-                    layers.RandomFlip(seed=SEED),
-                    layers.RandomRotation(0.2, seed=SEED),
-                    # VGG19
-                    layers.Lambda(tf.keras.applications.vgg19.preprocess_input),
-                    base,
-                    layers.Dropout(hp.Float('dropout', 0, 0.5, step=0.1, default=0.4)),
-                    # Fully connected layers
-                    layers.Dense( hp.Int('hidden_size', 384, 1384, step=200, default=384), activation="relu"),
-                    layers.Dropout(0.3),
-                    layers.Dense(64, activation="relu"),
-                    layers.Dropout(0.2),
-                    layers.Dense(1, activation="sigmoid"),
-                ],
-                name="VGG19",
-            )
-            model.summary()
 
-            print("Compiling...")
-            model.compile(
-                optimizer=tf.keras.optimizers.Adam(hp.Float('learning_rate', 1e-3, 1e-2, sampling='log')),
-                loss=tf.keras.losses.BinaryCrossentropy(),
-                metrics=[tf.keras.metrics.AUC(name="roc_auc"), "accuracy"],
-            )
-            print("Finished compiling.")
+    def build_VGGNet_breakhis_hp_optimized(self, hp):
+        """
+        Builds an instance of VGG19 using transfer learning from ImageNet and trained further on BreaKHis, called with tuner method below
+        Optimizes HPs dropout percnetage, number neurons in FC layer, learning rate
 
-            return model
-    
-    def train_VGG19_with_bayesian_tuner(self,trials = 20):
-        
+        About 600K learnables
+        """
+        base = VGG19(
+            include_top=False,
+            input_shape=(IMG_SIZE, IMG_SIZE, 3),
+            weights="imagenet",
+            pooling="avg",
+        )
+        base.trainable = False
+        model = tf.keras.Sequential(
+            [
+                layers.Input(shape=(IMG_SIZE, IMG_SIZE, 3)),
+                # Data augmentation
+                layers.RandomBrightness(0.2, seed=SEED),
+                layers.RandomFlip(seed=SEED),
+                layers.RandomRotation(0.2, seed=SEED),
+                # VGG19
+                layers.Lambda(tf.keras.applications.vgg19.preprocess_input),
+                base,
+                layers.Dropout(hp.Float("dropout", 0, 0.5, step=0.1, default=0.4)),
+                # Fully connected layers
+                layers.Dense(
+                    hp.Int("hidden_size", 384, 1384, step=200, default=384),
+                    activation="relu",
+                ),
+                layers.Dropout(0.3),
+                layers.Dense(64, activation="relu"),
+                layers.Dropout(0.2),
+                layers.Dense(1, activation="sigmoid"),
+            ],
+            name="VGG19",
+        )
+        model.summary()
+
+        print("Compiling...")
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(
+                hp.Float("learning_rate", 1e-3, 1e-2, sampling="log")
+            ),
+            loss=tf.keras.losses.BinaryCrossentropy(),
+            metrics=[tf.keras.metrics.AUC(name="roc_auc"), "accuracy"],
+        )
+        print("Finished compiling.")
+
+        return model
+
+    def train_VGG19_with_bayesian_tuner(self, trials=20):
         # call build method wich whill compile the model, 20 configurations of networks will be trained by default if trials not passed
-        
+
         tuner = kt.tuners.BayesianOptimization(
-          self.build_VGGNet_breakhis_hp_optimized,
-          objective='val_accuracy',
-          max_trials=trials,
-          overwrite = True,
-          project_name=self.VGGNet_breakhis_path_optimized+"_Bayesian_trials"
+            self.build_VGGNet_breakhis_hp_optimized,
+            objective="val_accuracy",
+            max_trials=trials,
+            overwrite=True,
+            project_name=self.VGGNet_breakhis_path_optimized + "_Bayesian_trials",
         )
 
         early_stopping = EarlyStopping(
             min_delta=1e-4, patience=5, verbose=1, restore_best_weights=True
-            )
+        )
         reduce_lr = ReduceLROnPlateau(factor=0.5, patience=4, verbose=1)
 
         # call tuner.search instead of model.fit
         tuner.search(
-                    train_ds,
-                    validation_data=validation_ds,
-                    epochs=MAX_EPOCHS,
-                    callbacks=[early_stopping, reduce_lr],
-                )
+            train_ds,
+            validation_data=validation_ds,
+            epochs=MAX_EPOCHS,
+            callbacks=[early_stopping, reduce_lr],
+        )
 
         try:
             tuner.get_best_models(1)[0].save(self.VGGNet_breakhis_path_optimized)
@@ -425,15 +461,12 @@ class Models:
             return tuner
         return tuner
 
-
     def open_model(self, path):
         if "AlexNet_BreaKHis" in path:
             SEED = 51432
             tf.keras.utils.set_random_seed(SEED)
             tf.config.experimental.enable_op_determinism()
-            fold_info = pd.read_csv(
-                "/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/models/data/BreaKHis_v1/Folds.csv"
-            )
+            fold_info = pd.read_csv("Folds.csv")
             fold_info["label"] = fold_info["filename"].str.extract("(malignant|benign)")
             train = fold_info.query("grp == 'train'")
             test = fold_info.query("grp == 'test'")

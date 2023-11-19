@@ -6,7 +6,7 @@ from sklearn import metrics
 from tensorflow.keras.applications.vgg19 import decode_predictions, preprocess_input
 from tensorflow.keras.preprocessing import image
 
-from og_models import Models
+from models import Models
 
 """
 This file shows how to use the Models class in models.py
@@ -56,7 +56,7 @@ def test_alex_breakhis():
     evaluate_model(
         alex,
         models.AlexNetBreaKHis_test,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/AlexNetBreaKHis/w11",
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/AlexNetBreaKHis/w12a",
     )
 
 
@@ -65,7 +65,7 @@ def test_vgg_breakhis():
     evaluate_model(
         vgg,
         models.AlexNetBreaKHis_test,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis/w11",
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis/w12a",
     )
 
 
@@ -74,7 +74,7 @@ def test_vgg_breakhis_optimized():
     evaluate_model(
         vgg,
         models.AlexNetBreaKHis_test,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis_optimized/w11",
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis_optimized/w12a",
     )
 
 
