@@ -190,3 +190,4 @@ models/VGGNet_BreakHis_optimized/saved_model.pb
 models/VGGNet_BreakHis_optimized/variables/variables.data-00000-of-00001
 models/VGGNet_BreakHis_optimized/variables/variables.index
 models/Normalized
+models/Folds.csv
