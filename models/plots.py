@@ -49,32 +49,86 @@ def test_alex_mnist():
     )
 
 
-def test_alex_breakhis():
+def test_w10alex_breakhis():
     alex = models.open_model(
-        "/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/models/AlexNet_BreaKHis"
+        "/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/models/w10_AlexNet_BreaKHis"
     )
     evaluate_model(
         alex,
         models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/AlexNetBreaKHis/w12b",
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w10_AlexNetBreaKHis/w13",
     )
 
 
-def test_vgg_breakhis():
+def test_w10vgg_breakhis():
+    vgg = models.open_model("w10_VGGNet_BreaKHis")
+    evaluate_model(
+        vgg,
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w10_VGG19BreaKHis/w13",
+    )
+
+
+def test_w11vgg_breakhis():
     vgg = models.open_model("VGGNet_BreaKHis")
     evaluate_model(
         vgg,
         models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis/w12b",
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w11_VGG19BreaKHis/w13",
     )
 
 
-def test_vgg_breakhis_optimized():
+def test_w12vgg_breakhis():
+    vgg = models.open_model("w12_VGGNet_BreaKHis")
+    evaluate_model(
+        vgg,
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w12_VGG19BreaKHis/w13",
+    )
+
+
+def test_w11vgg_breakhis_optimized():
     vgg = models.open_model("VGGNet_BreaKHis_optimized")
     evaluate_model(
         vgg,
         models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/VGG19BreaKHis_optimized/w12b",
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w11_VGG19BreaKHis_optimized/w13",
+    )
+
+
+def test_w12vgg_breakhis_optimized():
+    vgg = models.open_model("w12_VGGNet_BreaKHis_optimized")
+    evaluate_model(
+        vgg,
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w12_VGG19BreaKHis_optimized/w13",
+    )
+
+
+def test_w13vgg_breakhis_optimized():
+    vgg = models.open_model("w13_VGGNet_BreaKHis")
+    evaluate_model(
+        vgg,
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w13_VGG19BreaKHis_optimized/w13",
+    )
+
+
+def test_w13vgg_tuned_breakhis_optimized():
+    vgg = models.open_model("VGG_BreaKHis_fineTuned")
+    evaluate_model(
+        vgg,
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w13_VGG19BreaKHis_finetuned/w13",
+    )
+
+
+def test_w13vgg_tuned2_breakhis_optimized():
+    vgg = models.open_model("VGG_BreaKHis_fineTuned2")
+    evaluate_model(
+        vgg,
+        models.test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w13_VGG19BreaKHis_finetuned2/w13",
     )
 
 
@@ -140,18 +194,42 @@ if __name__ == "__main__":
         #     "-----------------------------------\nTesting AlexNet MNIST...\n-----------------------------------"
         # )
         # test_alex_mnist()
+        # print(
+        #     "-----------------------------------\nTesting Week 10 AlexNet...\n-----------------------------------"
+        # )
+        # test_w10alex_breakhis()
         print(
-            "-----------------------------------\nTesting AlexNet BreaKHis...\n-----------------------------------"
+            "-----------------------------------\nTesting Week 10 VGGNet...\n-----------------------------------"
         )
-        test_alex_breakhis()
+        test_w10vgg_breakhis()
         print(
-            "-----------------------------------\nTesting VGGNet BreaKHis...\n-----------------------------------"
+            "-----------------------------------\nTesting Week 11 VGGNet...\n-----------------------------------"
         )
-        test_vgg_breakhis()
+        test_w11vgg_breakhis()
         print(
-            "-----------------------------------\nTesting VGGNet (Optimized) BreaKHis...\n-----------------------------------"
+            "-----------------------------------\nTesting Week 11 VGGNet (Optimized)...\n-----------------------------------"
         )
-        test_vgg_breakhis_optimized()
+        test_w11vgg_breakhis_optimized()
+        print(
+            "-----------------------------------\nTesting Week 12 VGGNet...\n-----------------------------------"
+        )
+        test_w12vgg_breakhis()
+        print(
+            "-----------------------------------\nTesting Week 12 VGGNet (Optimized)...\n-----------------------------------"
+        )
+        test_w12vgg_breakhis_optimized()
+        print(
+            "-----------------------------------\nTesting Week 13 VGGNet...\n-----------------------------------"
+        )
+        test_w13vgg_breakhis_optimized()
+        print(
+            "-----------------------------------\nTesting Week 13 VGGNet (Fine Tuned)...\n-----------------------------------"
+        )
+        test_w13vgg_tuned_breakhis_optimized()
+        print(
+            "-----------------------------------\nTesting Week 13 VGGNet (Fine Tuned 2)...\n-----------------------------------"
+        )
+        test_w13vgg_tuned2_breakhis_optimized()
     except TypeError:
         print(
             "A TypeError has occurred. If the plots showed up as expected, feel free to ignore this."
