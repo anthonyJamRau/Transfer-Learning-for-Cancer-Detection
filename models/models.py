@@ -36,6 +36,7 @@ BATCH_SIZE = 48
 IMG_SIZE = 224
 BASE_LEARNING_RATE = 0.001
 tf.keras.utils.set_random_seed(SEED)
+tf.config.experimental.enable_op_determinism()
 MAX_EPOCHS = 10
 
 
