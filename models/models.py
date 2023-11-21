@@ -28,7 +28,7 @@ import os
 import keras_tuner as kt
 
 
-
+SEED = 51432
 data_dir_train = 'Normalized-Train/'
 data_dir_validation = 'Normalized-Validation/'
 data_dir_test = 'Normalized-Test/'
