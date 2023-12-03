@@ -87,7 +87,9 @@ if do_validation:
     X_validation = "Normalized/" + validation["input_path"]
     y_validation = validation["encoded_class"]
 X_test = "Normalized/" + test["input_path"]
+print(X_test.shape)
 y_test = test["encoded_class"]
+print(y_test.shape)
 
 
 def load_image(filename: str, label: int) -> Tuple[tf.Tensor, str]:

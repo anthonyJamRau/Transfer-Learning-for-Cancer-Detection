@@ -5,6 +5,8 @@ import numpy as np
 from sklearn import metrics
 from tensorflow.keras.applications.vgg19 import decode_predictions, preprocess_input
 from tensorflow.keras.preprocessing import image
+import tensorflow as tf
+import pandas as pd
 
 from models import Models
 
@@ -14,6 +16,46 @@ This file shows how to use the Models class in models.py
 
 # First, create an instance of models
 models = Models()
+
+# Make test_ds
+BATCH_SIZE = 28
+IMG_SIZE = 224
+
+X_test_b = os.listdir("Normalized-Test/Benign")
+X_test_m = os.listdir("Normalized-Test/Malignant")
+
+# Create a DataFrame object with the path and encoded label
+X_test_df = pd.DataFrame(
+    {"path": X_test_b + X_test_m, "label": [0] * len(X_test_b) + [1] * len(X_test_m)}
+)
+
+# Prefix each path with the appropriate directory based on the label
+X_test_df["path"] = X_test_df.apply(
+    lambda row: f"Normalized-Test/Benign/{row['path']}"
+    if row["label"] == 0
+    else f"Normalized-Test/Malignant/{row['path']}",
+    axis=1,
+)
+
+
+X_test = X_test_df["path"]
+
+
+y_test = X_test_df["label"]
+
+
+def load_image(filename: str, label: int):
+    file = tf.io.read_file(filename)
+    img = tf.image.decode_png(file, channels=3)
+    img = tf.image.resize_with_pad(img, IMG_SIZE, IMG_SIZE)
+    return img, label
+
+
+test_ds = (
+    tf.data.Dataset.from_tensor_slices((X_test, y_test))
+    .map(load_image)
+    .batch(BATCH_SIZE)
+)
 
 
 def test_vgg_imagenet():
@@ -55,26 +97,26 @@ def test_w10alex_breakhis():
     )
     evaluate_model(
         alex,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w10_AlexNetBreaKHis/w13",
+        test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w10_AlexNetBreaKHis/w14",
     )
 
 
-def test_w10vgg_breakhis():
-    vgg = models.open_model("w10_VGGNet_BreaKHis")
-    evaluate_model(
-        vgg,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w10_VGG19BreaKHis/w13",
-    )
+# def test_w10vgg_breakhis():
+#     vgg = models.open_model("w10_VGGNet_BreaKHis")
+#     evaluate_model(
+#         vgg,
+#         test_ds,
+#         save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w10_VGG19BreaKHis/w14",
+#     )
 
 
 def test_w11vgg_breakhis():
     vgg = models.open_model("VGGNet_BreaKHis")
     evaluate_model(
         vgg,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w11_VGG19BreaKHis/w13",
+        test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w14_VGG19BreaKHis/w14",
     )
 
 
@@ -82,8 +124,8 @@ def test_w12vgg_breakhis():
     vgg = models.open_model("w12_VGGNet_BreaKHis")
     evaluate_model(
         vgg,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w12_VGG19BreaKHis/w13",
+        test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w12_VGG19BreaKHis/w14",
     )
 
 
@@ -91,8 +133,8 @@ def test_w11vgg_breakhis_optimized():
     vgg = models.open_model("VGGNet_BreaKHis_optimized")
     evaluate_model(
         vgg,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w11_VGG19BreaKHis_optimized/w13",
+        test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w11_VGG19BreaKHis_optimized/w15",
     )
 
 
@@ -100,46 +142,42 @@ def test_w12vgg_breakhis_optimized():
     vgg = models.open_model("w12_VGGNet_BreaKHis_optimized")
     evaluate_model(
         vgg,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w12_VGG19BreaKHis_optimized/w13",
+        test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w12_VGG19BreaKHis_optimized/w15",
     )
 
 
-def test_w13vgg_breakhis_optimized():
-    vgg = models.open_model("w13_VGGNet_BreaKHis")
+def test_w14vgg_breakhis_optimized():
+    vgg = models.open_model("w14_VGGNet_BreaKHis")
     evaluate_model(
         vgg,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w13_VGG19BreaKHis_optimized/w13",
+        test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w14_VGG19BreaKHis_optimized/w14",
     )
 
 
-def test_w13vgg_tuned_breakhis_optimized():
+def test_w14vgg_tuned_breakhis_optimized():
     vgg = models.open_model("VGG_BreaKHis_fineTuned")
     evaluate_model(
         vgg,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w13_VGG19BreaKHis_finetuned/w13",
+        test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w14_VGG19BreaKHis_finetuned/w14",
     )
 
 
-def test_w13vgg_tuned2_breakhis_optimized():
+def test_w14vgg_tuned2_breakhis_optimized():
     vgg = models.open_model("VGG_BreaKHis_fineTuned2")
     evaluate_model(
         vgg,
-        models.test_ds,
-        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w13_VGG19BreaKHis_finetuned2/w13",
+        test_ds,
+        save_dir="/Users/jakestrasler/Documents/msml/Transfer-Learning-for-Cancer-Detection/plots/w14_VGG19BreaKHis_finetuned2/w14",
     )
 
 
 def evaluate_model(model, dataset, save_dir=None):
     loss, auc, accuracy = model.evaluate(dataset, verbose=1)
-    print(
-        f"\nROC-AUC:   {auc:.5f}",
-        f"Accuracy:  {accuracy:.5f}",
-        f"Loss:      {loss:.5f}\n",
-        sep="\n",
-    )
+    predictions = model.predict(dataset, verbose=0).reshape(-1)
+
     # Get labels and predictions for each batch in dataset
     print(
         f"Getting labels and predictions for each batch in dataset for model {model.name}..."
@@ -148,6 +186,20 @@ def evaluate_model(model, dataset, save_dir=None):
         (labels, model.predict(images, verbose=0).reshape(-1))
         for images, labels in dataset.take(-1)
     ]
+    labels = np.concatenate([x[0] for x in results])
+    preds = np.concatenate([x[1] for x in results])
+    precision, recall, f1, _ = metrics.precision_recall_fscore_support(
+        labels, preds.round().astype("uint8"), average="binary"
+    )
+    print(
+        f"\nROC-AUC:   {auc:.5f}",
+        f"Accuracy:  {accuracy:.5f}",
+        f"Precision: {precision:.5f}",
+        f"Recall:    {recall:.5f}",
+        f"F1-Score:  {f1:.5f}",
+        f"Loss:      {loss:.5f}\n",
+        sep="\n",
+    )
     print(
         f"Finished getting labels and predictions for each batch in dataset for model {model.name}."
     )
@@ -198,14 +250,15 @@ if __name__ == "__main__":
         #     "-----------------------------------\nTesting Week 10 AlexNet...\n-----------------------------------"
         # )
         # test_w10alex_breakhis()
-        print(
-            "-----------------------------------\nTesting Week 10 VGGNet...\n-----------------------------------"
-        )
-        test_w10vgg_breakhis()
+
+        # print(
+        #     "-----------------------------------\nTesting Week 10 VGGNet...\n-----------------------------------"
+        # )
+        # test_w10vgg_breakhis()
         print(
             "-----------------------------------\nTesting Week 11 VGGNet...\n-----------------------------------"
         )
-        test_w11vgg_breakhis()
+        # test_w11vgg_breakhis()
         print(
             "-----------------------------------\nTesting Week 11 VGGNet (Optimized)...\n-----------------------------------"
         )
@@ -213,7 +266,7 @@ if __name__ == "__main__":
         print(
             "-----------------------------------\nTesting Week 12 VGGNet...\n-----------------------------------"
         )
-        test_w12vgg_breakhis()
+        # test_w12vgg_breakhis()
         print(
             "-----------------------------------\nTesting Week 12 VGGNet (Optimized)...\n-----------------------------------"
         )
@@ -221,15 +274,15 @@ if __name__ == "__main__":
         print(
             "-----------------------------------\nTesting Week 13 VGGNet...\n-----------------------------------"
         )
-        test_w13vgg_breakhis_optimized()
+        # test_w14vgg_breakhis_optimized()
         print(
             "-----------------------------------\nTesting Week 13 VGGNet (Fine Tuned)...\n-----------------------------------"
         )
-        test_w13vgg_tuned_breakhis_optimized()
+        # test_w14vgg_tuned_breakhis_optimized()
         print(
             "-----------------------------------\nTesting Week 13 VGGNet (Fine Tuned 2)...\n-----------------------------------"
         )
-        test_w13vgg_tuned2_breakhis_optimized()
+        # test_w14vgg_tuned2_breakhis_optimized()
     except TypeError:
         print(
             "A TypeError has occurred. If the plots showed up as expected, feel free to ignore this."
